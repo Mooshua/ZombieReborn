@@ -1,4 +1,7 @@
-function Infect(hInflictor, hInfected, bKeepPosition)
+local Infect = {}
+local Util = require("ZombieReborn.util.functions")
+
+function Infect.InfectPlayer(hInflictor, hInfected, bKeepPosition)
     local vecOrigin = hInfected:GetOrigin()
     local vecAngles = hInfected:EyeAngles()
 
@@ -18,7 +21,10 @@ function Infect(hInflictor, hInfected, bKeepPosition)
     hInfected:SetAngles(vecAngles.x, vecAngles.y, vecAngles.z)
 end
 
-function Infect_PickMotherZombies()
+--  Expose infect to global scope to allow I/O to easily access it
+Infect = Infect.Infect
+
+function Infect.Infect_PickMotherZombies()
     local iMZRatio = CVARS.Infect.SpawnMZRatio
     local iMZMinimumCount = CVARS.Infect.SpawnMZMinCount
     local bSpawnType = (CVARS.Infect.SpawnType == 0)
@@ -49,7 +55,7 @@ function Infect_PickMotherZombies()
             return
         end
         
-        local tPlayerTableShuffled = table.shuffle(tPlayerTable)
+        local tPlayerTableShuffled = Util.shuffle(tPlayerTable)
 
         for idx = 1, #tPlayerTableShuffled do
             local hPlayer = tPlayerTableShuffled[idx]
@@ -68,7 +74,7 @@ function Infect_PickMotherZombies()
                 table.insert(tMotherZombies, hPlayer)
 
                 -- remove player from players table so they can't be chosen again
-                table.RemoveValue(tPlayerTable, hPlayer)
+                Util.removeValue(tPlayerTable, hPlayer)
             end
 
             if #tMotherZombies == iMotherZombieCount then return end
@@ -89,7 +95,7 @@ function Infect_PickMotherZombies()
     ZR_ZOMBIE_SPAWNED = true
 end
 
-function Infect_OnRoundFreezeEnd()
+function Infect.Infect_OnRoundFreezeEnd()
     local iMZSpawntimeMinimum = CVARS.Infect.SpawnTimeMin
     local iMZSpawntimeMaximum = CVARS.Infect.SpawnTimeMax
     local iMZSpawntime = math.random(iMZSpawntimeMinimum,iMZSpawntimeMaximum)
@@ -121,3 +127,5 @@ function Infect_OnRoundFreezeEnd()
         end
     })
 end
+
+return Infect

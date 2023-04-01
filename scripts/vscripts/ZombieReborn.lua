@@ -1,11 +1,11 @@
 print("Starting ZombieReborn!")
 
-require "ZombieReborn.util.const"
-require "ZombieReborn.util.functions"
+local Const = require "ZombieReborn.util.const"
+local Utils = require "ZombieReborn.util.functions"
 require "ZombieReborn.util.timers"
 
 require "ZombieReborn.Convars"
-require "ZombieReborn.Infect"
+local Infect = require "ZombieReborn.Infect"
 require "ZombieReborn.Knockback"
 require "ZombieReborn.RepeatKiller"
 
@@ -43,7 +43,7 @@ function SetAllHuman()
         local hController = EntIndexToHScript(i)
 
         if hController ~= nil then
-            hController:GetPawn():SetTeam(CS_TEAM_CT)
+            hController:GetPawn():SetTeam(Const.CS_TEAM_CT)
         end
     end
 
@@ -56,10 +56,10 @@ function OnPlayerHurt(event)
     local hAttacker = EHandleToHScript(event.attacker_pawn)
     local hVictim = EHandleToHScript(event.userid_pawn)
 
-    if hAttacker:GetTeam() == CS_TEAM_CT and hVictim:GetTeam() == CS_TEAM_T then
+    if hAttacker:GetTeam() == Const.CS_TEAM_CT and hVictim:GetTeam() == Const.CS_TEAM_T then
         Knockback_Apply(hAttacker, hVictim, event.dmg_health, event.weapon)
-    elseif hAttacker:GetTeam() == CS_TEAM_T and hVictim:GetTeam() == CS_TEAM_CT then
-        Infect(hAttacker, hVictim, true)
+    elseif hAttacker:GetTeam() == Const.CS_TEAM_T and hVictim:GetTeam() == Const.CS_TEAM_CT then
+        Infect.InfectPlayer(hAttacker, hVictim, true)
     end
 end
 
@@ -71,12 +71,12 @@ function OnPlayerDeath(event)
     local hVictim = EHandleToHScript(event.userid_pawn)
 
     --Prevent Infecting the player in the same tick as the player dying
-    if hAttacker:GetTeam() == CS_TEAM_T and hVictim:GetTeam() == CS_TEAM_CT then
+    if hAttacker:GetTeam() == CS_TEAM_T and hVictim:GetTeam() == Const.CS_TEAM_CT then
         DoEntFireByInstanceHandle(hVictim, "runscriptcode", "Infect(nil, thisEntity, true)", 0, nil, nil)
     end
 
     -- Infect Humans that died after first infection has started
-    if ZR_ROUND_STARTED and ZR_ZOMBIE_SPAWNED and hVictim:GetTeam() == CS_TEAM_CT then
+    if ZR_ROUND_STARTED and ZR_ZOMBIE_SPAWNED and hVictim:GetTeam() == Const.CS_TEAM_CT then
         --Prevent Infecting the player in the same tick as the player dying
         DoEntFireByInstanceHandle(hVictim, "runscriptcode", "Infect(nil, thisEntity, false)", 0.1, nil, nil)
     end
@@ -86,8 +86,8 @@ end
 function OnPlayerSpawn(event)
     local hPlayer = EHandleToHScript(event.userid_pawn)
 
-    if ZR_ZOMBIE_SPAWNED and hPlayer:GetTeam() == CS_TEAM_CT then
-        Infect(nil, hPlayer, true)
+    if ZR_ZOMBIE_SPAWNED and hPlayer:GetTeam() == Const.CS_TEAM_CT then
+        Infect.InfectPlayer(nil, hPlayer, true)
     end
 end
 
@@ -98,5 +98,5 @@ tListenerIds = {
     ListenToGameEvent("round_start", OnRoundStart, nil),
     ListenToGameEvent("hegrenade_detonate", Knockback_OnGrenadeDetonate, nil),
     ListenToGameEvent("molotov_detonate", Knockback_OnMolotovDetonate, nil),
-    ListenToGameEvent("round_freeze_end", Infect_OnRoundFreezeEnd, nil)
+    ListenToGameEvent("round_freeze_end", Infect.Infect_OnRoundFreezeEnd, nil)
 }

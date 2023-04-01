@@ -1,4 +1,4 @@
-bRepeatKillerToggle = false
+local bRepeatKillerToggle = false
 
 --Setup the initial logic_relay for repeat killer
 --Maps should toggle this when they want to stop zombie respawning
