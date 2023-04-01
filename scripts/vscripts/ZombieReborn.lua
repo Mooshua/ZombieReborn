@@ -2,6 +2,7 @@ print("Starting ZombieReborn!")
 
 local Const = require "ZombieReborn.util.const"
 local Utils = require "ZombieReborn.util.functions"
+local Protect = require "ZombieReborn.util.protect"
 require "ZombieReborn.util.timers"
 
 require "ZombieReborn.Convars"
